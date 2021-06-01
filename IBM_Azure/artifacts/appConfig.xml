@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Licensed Materials - Property of IBM
+    (c) Copyright IBM Corporation 2014, 2020. All Rights Reserved.
+    
+    Note to U.S. Government Users Restricted Rights:  
+    Use, duplication or disclosure restricted by GSA ADP Schedule 
+    Contract with IBM Corp. 
+ -->
+
+<!--
+    Deployment descriptor for the Jazz Authorization Server.
+    
+    NOTE: this file can be customized by copying the version from the defaults folder
+    up one level (to the jazzop folder), and editing the copied file.
+    The files in the defaults folder may be overwritten by the install of fixes, updates,
+    and new releases. Any customization done to this file will need to be re-applied
+    to new versions of the defaults file.
+ -->
+
+<server>
+
+    <!-- The Jazz OP application provides the login form and the standard Jazz security roles -->
+    <application
+     id="com.ibm.team.integration.jazzop"
+     location="jazzop.war"
+     name="com.ibm.team.integration.jazzop"
+     context-root="jazzop"
+     type="war">
+        <application-bnd>
+            <security-role name="JazzAdmins">
+                <group name="JazzAdmins"/>
+            </security-role>
+            <security-role name="JazzUsers">
+                <group name="JazzUsers"/>
+            </security-role>
+            <security-role name="JazzProjectAdmins">
+                <group name="JazzProjectAdmins"/>
+            </security-role>
+            <security-role name="JazzGuests">
+                <group name="JazzGuests"/>
+            </security-role>
+            <security-role name="JazzDebug">
+                <group name="JazzDebug"/>
+            </security-role>
+        </application-bnd>
+    </application>
+
+    <!-- Default port numbers used in URLs -->
+        <httpEndpoint host="*" httpPort="9280" httpsPort="9643" id="defaultHttpEndpoint"/>
+
+    <!-- Default LTPA token expiration time -->
+    <ltpa expiration="120m" />
+    
+    <!-- This setting is required -->
+    <httpSession invalidateOnUnauthorizedSessionRequestException="true" />
+                        
+    <!-- Default SSL Configuration
+     A self-signed certificate is used in the default configuration.
+     To avoid certificate warnings in browsers, a certificate issued by a trusted Certificate Authority
+     may be configured instead.
+    -->
+    <keyStore
+        id="defaultKeyStore"
+        location="ibm-team.keystore" 
+        type="JCEKS"
+        password="{xor}Nj0ycis6PjI="/>
+  
+    <ssl id="defaultSSLConfig"
+     keyStoreRef="defaultKeyStore"
+     trustStoreRef="defaultKeyStore"
+     serverKeyAlias="sslkey"
+     clientAuthenticationSupported="true"/>       
+
+        <!-- OpenID Connect Provider Configuration
+         By default, secure (https) URLs must be used. To allow unsecure (http) URLs,
+         change the 'httpsRequired' attribute value to 'false'.
+         -->
+        <openidConnectProvider id="jazzop" oauthProviderRef="JazzOP" sessionManaged="true" />  
+<!--         
+        <oauthProvider id="JazzOP"
+            httpsRequired="true"
+                autoAuthorize="true"
+                customLoginURL="/jazzop/form/login" 
+                accessTokenLifetime="7201" 
+                authorizationGrantLifetime="604801"
+                passwordGrantRequiresAppPassword="true"
+                trackOAuthClients="true">
+                <databaseStore dataSourceRef="OAuthFvtDataSource" /> 
+        </oauthProvider>
+-->
+
+<oauthProvider id="JazzOP"
+httpsRequired="true"
+autoAuthorize="true"
+customLoginURL="/jazzop/form/login"
+accessTokenLifetime="7201" 
+authorizationGrantLifetime="604801">
+<autoAuthorizeClient>client01</autoAuthorizeClient>
+<databaseStore dataSourceRef="OAUTH2DBDS" /> 
+</oauthProvider>
+
+    <!-- By default, all users can be authentication with OAuth/OpenID Connect,
+     and only users with the "JazzAdmins" role can manage registered client applications.
+     -->
+    <oauth-roles>
+        <authenticated>
+            <special-subject type="ALL_AUTHENTICATED_USERS" />
+        </authenticated>
+        <clientManager>
+            <group name="JazzAdmins" />      
+        </clientManager>        
+    </oauth-roles>  
+
+    <!-- Database configuration for client registration and token cache
+     By default, an embedded Derby database is used.
+     -->
+
+<!--
+
+    <dataSource id="OAuthFvtDataSource" jndiName="jdbc/OAuth2DB">
+        <jdbcDriver libraryRef="DerbyLib" />
+        <properties.derby.embedded
+            databaseName="asDB"
+            createDatabase="create" />
+    </dataSource>
+
+
+    <library id="DerbyLib">
+        <fileset dir="${shared.config.dir}/lib/global" includes="derby.jar" />
+    </library>
+    
+-->
+
+<dataSource id="OAUTH2DBDS" jndiName="jdbc/OAUTH2DB">
+<jdbcDriver libraryRef="MSJDBCLib"/>
+<properties.microsoft.sqlserver user="oauth2dbDBuser" password="oauth2dbDBpswd" databaseName="OAUTH2DB" serverName="ibmdbserver" portNumber="1433"/>
+</dataSource>
+<library id="MSJDBCLib">
+<fileset dir="${shared.config.dir}/lib/global" id="sqljdbc42" includes="sqljdbc42.jar"/>
+</library>
+
+
+    <!-- SAML 
+    The three sections below define settings required for supporting SAML authentication.    
+    
+    To enable SAML, uncomment samlWebSso20 and authFilterbelow.
+    Depending on your SAML sever you could perhaps have additional configuration. 
+    Please see the online documentation for details
+    -->
+     
+    <!-- start of SAML -->
+    <!--
+        <samlWebSso20 
+                id="defaultSP"
+                spCookieName="jazzop_sso_cookie_idp"
+                forceAuthn="true" 
+                authFilterRef="samlAuthFilter">
+    </samlWebSso20>
+
+        <authFilter id="samlAuthFilter">
+        <requestUrl id="samlRequestUrl" urlPattern="/authorize" matchType="contains" />
+                <userAgent id="samlUserAgent" agent="Mozilla|Opera" matchType="contains"/>
+    </authFilter>
+
+        -->
+        <!-- end of SAML -->    
+    
+    <!-- User Registry
+     By default, a file-based user registry is used. The localUserRegistry.xml file
+     can be modified to define users and the groups they belong too; the provided file
+     is just a sample.
+     To use an LDAP user registry instead, modify ldapUserRegistry.xml as appropriate for
+     your site, then comment out the include element for localUserRegistry.xml,
+     and uncomment the include element for ldapUserRegistry.xml.
+     -->
+    <include location="localUserRegistry.xml" optional="true"/>
+    <!--include location="ldapUserRegistry.xml" optional="true"/-->
+
+</server>

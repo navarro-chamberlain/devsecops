@@ -1,0 +1,23 @@
+---
+# This playbook deploys the whole application stack in this site.
+
+- name: apply common configuration to all nodes
+  hosts: all
+  remote_user: root
+
+  roles:
+    - common
+
+- name: configure and Deploy Jazz Authentication Server 
+  hosts: jas
+  remote_user: root
+
+  roles:
+    - jas
+
+- name: configure and Deploy Engineering Workflow Management Server 
+  hosts: ewm
+  remote_user: root
+
+  roles:
+    - ewm

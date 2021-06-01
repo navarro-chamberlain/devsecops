@@ -1,0 +1,123 @@
+---
+- name: Install Jazz Authentication Server
+  hosts: localhost
+  remote_user: root
+
+  tasks:
+  - name: Upgrade all packages
+    become: yes
+    yum:
+      name: '*'
+      state: latest
+
+  - name: Install Prerequisites
+    become: yes
+    yum:
+      name:
+        - java-11-openjdk-devel
+        - wget
+        - unzip
+      state: present
+
+  - name: Ensure group "JTS" exists
+    become: yes
+    group:
+      name: jts
+      state: present
+
+  - name: Add the user jtsservice
+    become: yes
+    ansible.builtin.user:
+      name: jtsservice
+      comment: Jazz service account
+      group: jts
+
+  - name: Create a ELM directory if it does not exist
+    become: yes
+    ansible.builtin.file:
+      path: /opt/ELM/
+      state: directory
+      mode: '0755'
+
+  - name: Create a jts directory if it does not exist
+    become: yes
+    ansible.builtin.file:
+      path: /opt/jts/
+      state: directory
+      mode: '0755'
+
+  - name: Create a download directory if it does not exist
+    become: yes
+    ansible.builtin.file:
+      path: /opt/download/
+      state: directory
+      mode: '0755'
+
+  - name: Download ELM
+    become: yes
+    get_url:
+      url: https://diagc8909e4e6fca01a1.blob.core.windows.net/binaries/ELM-Web-Installer-Linux-7.0.2.zip
+      dest: /opt/download/ELM-Web-Installer-Linux-7.0.2.zip
+      tmp_dest: /opt/download/
+
+  - name: Download jts
+    become: yes
+    get_url:
+      url: https://diagc8909e4e6fca01a1.blob.core.windows.net/binaries/JazzAuthServer-offering-repo-7.0.2.zip
+      dest: /opt/download/JazzAuthServer-offering-repo-7.0.2.zip
+      tmp_dest: /opt/download/
+
+  - name: Unarchive ELM
+    become: yes
+    ansible.builtin.unarchive:
+      src: /opt/download/ELM-Web-Installer-Linux-7.0.2.zip
+      dest: /opt/ELM/
+      remote_src: yes
+
+  - name: Delete ELM Binary
+    become: yes
+    file:
+      state: absent
+      path: /opt/download/ELM-Web-Installer-Linux-7.0.2.zip
+
+  - name: Unarchive jts
+    become: yes
+    ansible.builtin.unarchive:
+      src: /opt/download/JazzAuthServer-offering-repo-7.0.2.zip
+      dest: /opt/jts/
+      remote_src: yes
+
+  - name: Delete ELM Binary
+    become: yes
+    file:
+      state: absent
+      path: /opt/download/ELM-Web-Installer-Linux-7.0.2.zip
+  
+  - name: Delete jts Binary
+    become: yes
+    file:
+      state: absent
+      path: /opt/download/JazzAuthServer-offering-repo-7.0.2.zip
+
+  - name: Move jts File to proper directory
+    become: yes
+    command: mv /opt/jts/im/repo/jlip-auth-offering/offering-repo /opt/ELM/im/repo -v
+  
+  - name: Install jts
+    become: yes
+    ansible.builtin.shell:
+      chdir: /opt/ELM/im/linux.gtk.x86_64/ 
+      cmd: ./installc -showVerboseProgress -input silent-install-jts2.xml --launcher.ini silent-install.ini -acceptLicense
+      
+  - name: Recursively change ownership of a directory
+    ansible.builtin.file:
+      path: /opt/
+      state: directory
+      recurse: yes
+      owner: jtsservice
+      group: jts
+
+  - name: Start jts
+    become: yes
+    ansible.builtin.shell:
+      cmd: /opt/IBM/JazzAuthServer/start-jazz 

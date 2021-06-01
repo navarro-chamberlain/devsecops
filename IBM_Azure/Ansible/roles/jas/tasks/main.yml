@@ -1,0 +1,111 @@
+---
+- name: insert firewalld rule for jas_port
+  become: yes
+  firewalld: port={{ jas_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: Ensure group "jas" exists
+  become: yes
+  group:
+    name: jas
+    state: present
+
+- name: Add the user jasservice
+  become: yes
+  ansible.builtin.user:
+    name: jasservice
+    comment: Jazz service account
+    group: jas
+
+- name: Recursively change ownership of a directory
+  become: yes
+  ansible.builtin.file:
+    path: /opt/
+    state: directory
+    recurse: yes
+    owner: jasservice
+    group: jas
+
+- name: Create a ELM directory if it does not exist
+  become: yes
+  ansible.builtin.file:
+    path: /opt/ELM/
+    state: directory
+    mode: '0755'
+
+- name: Create a JAS directory if it does not exist
+  become: yes
+  ansible.builtin.file:
+    path: /opt/JAS/
+    state: directory
+    mode: '0755'
+
+- name: Create a download directory if it does not exist
+  become: yes
+  ansible.builtin.file:
+    path: /opt/download/
+    state: directory
+    mode: '0755'
+
+- name: Download ELM
+  become: yes
+  get_url:
+    url: "{{ elm_binary }}"
+    dest: /opt/download/ELM-Web-Installer-Linux-7.0.2.zip
+    tmp_dest: /opt/download/
+
+- name: Unarchive ELM
+  become: yes
+  ansible.builtin.unarchive:
+    src: /opt/download/ELM-Web-Installer-Linux-7.0.2.zip
+    dest: /opt/ELM/
+    remote_src: yes
+
+- name: Delete ELM Binary
+  become: yes
+  file:
+    state: absent
+    path: /opt/download/ELM-Web-Installer-Linux-7.0.2.zip
+
+- name: Download JAS
+  become: yes
+  get_url:
+    url: "{{ jas_binary }}"
+    dest: /opt/download/JazzAuthServer-offering-repo-7.0.2.zip
+    tmp_dest: /opt/download/
+
+- name: Unarchive JAS
+  become: yes
+  ansible.builtin.unarchive:
+    src: /opt/download/JazzAuthServer-offering-repo-7.0.2.zip
+    dest: /opt/JAS/
+    remote_src: yes
+
+- name: Delete JAS Binary
+  become: yes
+  file:
+    state: absent
+    path: /opt/download/JazzAuthServer-offering-repo-7.0.2.zip
+
+- name: Move JAS REPO File to proper directory
+  become: yes
+  command: cp -R /opt/JAS/im/repo/jlip-auth-offering/offering-repo /opt/ELM/im/repo -v
+
+- name: Install JAS
+  become: yes
+  ansible.builtin.shell:
+    chdir: /opt/ELM/im/linux.gtk.x86_64/ 
+    cmd: ./installc -showVerboseProgress -input silent-install-jas2.xml --launcher.ini silent-install.ini -acceptLicense
+    
+- name: Start JAS
+  become: yes
+  ansible.builtin.shell:
+    cmd: /opt/IBM/JazzAuthServer/start-jazz 
+
+- name: Recursively change ownership of a directory
+  become: yes
+  ansible.builtin.file:
+    path: /opt/
+    state: directory
+    recurse: yes
+    owner: jasservice
+    group: jas

@@ -1,0 +1,13 @@
+#cloud-config
+# Add groups to the system
+# Adds the ubuntu group with members 'root' and 'sys'
+# and the empty group hashicorp.
+# Downloads the golang package
+#packages:
+  #- libselinux-python 
+ # - python
+
+package_upgrade: true
+
+runcmd:
+  - [ sh, sudo yum install -y libselinux-python python]

@@ -1,0 +1,56 @@
+Jazz SQL amendment
+
+configure SQL for use with Jazz
+
+create a file called createOauthMSSQL.sql
+
+run the sql script against server to create appropriate database
+
+open appConfig.xml at /opt/IBM/JazzAuthServer/wlp/usr/servers/jazzop
+
+comment out the apache derby section
+
+<dataSource id="OAuthFvtDataSource" jndiName="jdbc/OAuth2DB">
+        <jdbcDriver libraryRef="DerbyLib" />
+        <properties.derby.embedded
+            databaseName="asDB"
+            createDatabase="create" />
+    </dataSource>
+
+    <library id="DerbyLib">
+        <fileset dir="${shared.config.dir}/lib/global" includes="derby.jar" />
+    </library>
+
+
+
+add the following under it 
+
+<dataSource id="OAUTH2DBDS" jndiName="jdbc/OAUTH2DB">
+<jdbcDriver libraryRef="MSJDBCLib"/>
+<properties.microsoft.sqlserver user="username" password="Password" databaseName="OAUTH2DB" serverName="SQLDBServer" portNumber="1433"/>
+</dataSource>
+<library id="MSJDBCLib">
+<fileset dir="${shared.config.dir}/lib/global" id="sqljdbc42" includes="sqljdbc42.jar"/>
+</library>
+
+Ensure that you have the correct values for the following attributes:
+For user, provide the name of the MS SQL Server user that is used to connect to the database. 
+For password, use the MS SQL Server user password.
+For databaseName, use the database name you created in the previous step. If you used the sample script file, the database name is OAUTH2DB.
+For portNumber, use the port number that the MS SQL Server instance is running on. The default port number is 1433.
+For serverName, enter the host name of the MS SQL Server.
+
+In the oauthProvider section of the appConfig.xml file, update the databaseStore property so it specifies the MS SQL Server data source rather than the default Apache Derby data source. The databaseStore property should specify the name of the MS SQL Server data source, which in this example, is OAUTH2DBDS:
+
+<oauthProvider id="JazzOP"
+httpsRequired="true"
+autoAuthorize="true"
+customLoginURL="/jazzop/form/login"
+accessTokenLifetime="7201" 
+authorizationGrantLifetime="604801">
+<autoAuthorizeClient>client01</autoAuthorizeClient>
+<databaseStore dataSourceRef="OAUTH2DBDS" /> 
+</oauthProvider>
+
+Save and close the appConfig.xml file.
+Copy the MS SQL Server sqljdbc42.jar JDBC drivers from your MS SQL Server server to this directory: C:\IBM\JazzAuthServer\wlp\usr\shared\config\lib\global.                                                   

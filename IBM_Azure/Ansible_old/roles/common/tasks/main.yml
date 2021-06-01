@@ -1,0 +1,20 @@
+---
+
+- name: Upgrade all packages
+  become: yes
+  yum:
+    name: '*'
+    state: latest
+
+- name: Install Prerequisites
+  become: yes
+  yum:
+    name:
+      - java-11-openjdk-devel
+      - wget
+      - unzip
+    state: present
+
+- name: Start firewalld
+  service: name=firewalld state=started enabled=yes
+

@@ -1,0 +1,88 @@
+---
+- name: insert firewalld rule for ewm_port
+  firewalld: port={{ ewm_port }}/tcp permanent=true state=enabled immediate=yes
+
+- name: Ensure group "JTS" exists
+    become: yes
+    group:
+      name: jts
+      state: present
+
+- name: Add the user jtsservice
+  become: yes
+  ansible.builtin.user:
+    name: jtsservice
+    comment: Jazz service account
+    group: jts
+
+  - name: Recursively change ownership of a directory
+    ansible.builtin.file:
+      path: /opt/
+      state: directory
+      recurse: yes
+      owner: jtsservice
+      group: jts
+
+- name: Create a ELM directory if it does not exist
+  become: yes
+  ansible.builtin.file:
+    path: /opt/ELM/
+    state: directory
+    mode: '0755'
+
+- name: Create a jts directory if it does not exist
+  become: yes
+  ansible.builtin.file:
+    path: /opt/jts/
+    state: directory
+    mode: '0755'
+
+- name: Download ELM
+  become: yes
+  get_url:
+    url: {{ jas_port }}
+    dest: /opt/download/ELM-Web-Installer-Linux-7.0.2.zip
+    tmp_dest: /opt/download/
+
+- name: Unarchive ELM
+  become: yes
+  ansible.builtin.unarchive:
+    src: /opt/download/ELM-Web-Installer-Linux-7.0.2.zip
+    dest: /opt/ELM/
+    remote_src: yes
+
+- name: Delete ELM Binary
+  become: yes
+  file:
+    state: absent
+    path: /opt/download/ELM-Web-Installer-Linux-7.0.2.zip
+
+- name: Download JTS
+  become: yes
+  get_url:
+    url: {{ jas_port }}
+    dest: /opt/download/JTS-CCM-QM-RM-JRS-ENI-repo-7.0.2.zip
+    tmp_dest: /opt/download/
+
+- name: Unarchive JTS
+  become: yes
+  ansible.builtin.unarchive:
+    src: /opt/download/JTS-CCM-QM-RM-JRS-ENI-repo-7.0.2.zip
+    dest: /opt/JTS/
+    remote_src: yes
+
+- name: Delete JTS Binary
+  become: yes
+  file:
+    state: absent
+    path: /opt/download/JTS-CCM-QM-RM-JRS-ENI-repo-7.0.2.zip
+
+- name: Move ELM REPO File to proper directory
+  become: yes
+  command: cp -R /opt/JTS /opt/ELM/im/repo -v
+
+- name: Install JTS
+  become: yes
+  ansible.builtin.shell:
+    chdir: /opt/ELM/im/linux.gtk.x86_64/ 
+    cmd: ./installc -acceptLicense -showVerboseProgress -input silent-install-server2.xml --launcher.ini silent-install.ini

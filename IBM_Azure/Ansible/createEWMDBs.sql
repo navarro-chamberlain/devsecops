@@ -1,0 +1,158 @@
+CREATE DATABASE jts 
+GO 
+CREATE DATABASE ccm 
+GO 
+CREATE DATABASE qm 
+GO 
+CREATE DATABASE rm 
+GO 
+CREATE DATABASE dcc 
+GO 
+CREATE DATABASE lqe 
+GO 
+CREATE DATABASE ldx 
+GO 
+CREATE DATABASE eni 
+GO 
+CREATE DATABASE gc 
+GO 
+CREATE DATABASE dw 
+GO 
+CREATE DATABASE oauth2db 
+GO 
+
+CREATE LOGIN jtsDBuser
+WITH PASSWORD = 'jtsDBpswd';
+USE jts;
+exec sp_changedbowner 'jtsDBuser'
+GO 
+
+CREATE LOGIN ccmDBuser
+WITH PASSWORD = 'ccmDBpswd';
+USE ccm;
+exec sp_changedbowner 'ccmDBuser'
+GO 
+
+CREATE LOGIN qmDBuser
+WITH PASSWORD = 'qmDBpswd';
+USE qm;
+exec sp_changedbowner 'qmDBuser'
+GO 
+
+CREATE LOGIN rmDBuser
+WITH PASSWORD = 'rmDBpswd';
+USE rm;
+exec sp_changedbowner 'rmDBuser'
+GO 
+
+CREATE LOGIN dccDBuser
+WITH PASSWORD = 'dccDBpswd';
+USE dcc;
+exec sp_changedbowner 'dccDBuser'
+GO 
+
+CREATE LOGIN lqeDBuser
+WITH PASSWORD = 'lqeDBpswd';
+USE lqe;
+exec sp_changedbowner 'lqeDBuser'
+GO 
+
+CREATE LOGIN ldxDBuser
+WITH PASSWORD = 'ldxDBpswd';
+USE ldx;
+exec sp_changedbowner 'ldxDBuser'
+GO 
+
+CREATE LOGIN eniDBuser
+WITH PASSWORD = 'eniDBpswd';
+USE eni;
+exec sp_changedbowner 'eniDBuser'
+GO 
+
+CREATE LOGIN gcDBuser
+WITH PASSWORD = 'gcDBpswd';
+USE gc;
+exec sp_changedbowner 'gcDBuser'
+GO 
+
+CREATE LOGIN dwDBuser
+WITH PASSWORD = 'dwDBpswd';
+USE dw;
+exec sp_changedbowner 'dwDBuser'
+GO 
+
+
+
+CREATE LOGIN oauth2dbDBuser
+WITH PASSWORD = 'oauth2dbDBpswd';
+USE dw;
+exec sp_changedbowner 'oauth2dbDBuser'
+GO 
+
+ALTER DATABASE jts COLLATE SQL_Latin1_General_CP437_CS_AS 
+GO
+
+ALTER DATABASE ccm COLLATE SQL_Latin1_General_CP437_CS_AS 
+GO
+
+ALTER DATABASE qm COLLATE SQL_Latin1_General_CP437_CS_AS 
+GO
+
+ALTER DATABASE rm COLLATE SQL_Latin1_General_CP437_CS_AS 
+GO
+
+ALTER DATABASE dcc COLLATE SQL_Latin1_General_CP437_CS_AS 
+GO
+
+ALTER DATABASE lqe COLLATE SQL_Latin1_General_CP437_CS_AS 
+GO
+
+ALTER DATABASE ldx COLLATE SQL_Latin1_General_CP437_CS_AS 
+GO
+
+ALTER DATABASE eni COLLATE SQL_Latin1_General_CP437_CS_AS 
+GO
+
+ALTER DATABASE gc COLLATE SQL_Latin1_General_CP437_CS_AS 
+GO
+
+ALTER DATABASE dw COLLATE SQL_Latin1_General_CP1_CS_AS
+GO
+
+
+
+ALTER DATABASE oauth2db COLLATE SQL_Latin1_General_CP1_CS_AS
+GO
+
+ALTER DATABASE jts SET READ_COMMITTED_SNAPSHOT ON
+GO
+
+ALTER DATABASE ccm SET READ_COMMITTED_SNAPSHOT ON
+GO
+
+ALTER DATABASE qm SET READ_COMMITTED_SNAPSHOT ON
+GO
+
+ALTER DATABASE rm SET READ_COMMITTED_SNAPSHOT ON
+GO
+
+ALTER DATABASE dcc SET READ_COMMITTED_SNAPSHOT ON
+GO
+
+ALTER DATABASE lqe SET READ_COMMITTED_SNAPSHOT ON
+GO
+
+ALTER DATABASE ldx SET READ_COMMITTED_SNAPSHOT ON
+GO
+
+ALTER DATABASE eni SET READ_COMMITTED_SNAPSHOT ON
+GO
+
+ALTER DATABASE gc SET READ_COMMITTED_SNAPSHOT ON
+GO
+
+ALTER DATABASE dw SET READ_COMMITTED_SNAPSHOT ON
+GO
+
+ALTER DATABASE oauth2db SET READ_COMMITTED_SNAPSHOT ON
+GO

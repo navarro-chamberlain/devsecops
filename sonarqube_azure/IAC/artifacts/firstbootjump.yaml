@@ -1,0 +1,10 @@
+#cloud-config
+# Add groups to the system
+# Adds the ubuntu group with members 'root' and 'sys'
+# and the empty group hashicorp.
+# Downloads the golang package
+#cloud-config
+runcmd:
+  - [ sh, sudo yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm]
+  - [ sh, sudo yum upgrade -y]
+  - [ sh, sudo yum install -y ansible]

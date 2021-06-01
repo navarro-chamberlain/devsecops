@@ -1,0 +1,82 @@
+---
+- name: Install Sonarqube on App Nodes
+  hosts: app_nodes
+  remote_user: azureuser
+
+  tasks:
+  - name: Upgrade all packages
+    become: yes
+    yum:
+      name: '*'
+      state: latest
+
+  - name: Add repository
+    yum_repository:
+      name: epel
+      description: Postgress YUM repo
+      baseurl: https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+
+
+  - name: Install Prerequisites
+    become: yes
+    yum:
+      name:
+        - java-11-openjdk-devel
+        - wget
+        - unzip
+        - postgresql13
+      state: present
+
+  - name: Ensure group "sonar" exists
+    become: yes
+    group:
+      name: sonar
+      state: present
+
+  - name: Add the user sonar
+    become: yes
+    ansible.builtin.user:
+      name: sonar
+      comment: sonar service account
+      group: sonar
+
+  - name: create directory if they don't exist
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: sonar
+      group: sonar
+      mode: 0775
+    loop:
+      - /opt/download/
+      - /var/sonarqube/data
+      - /var/sonarqube/temp
+
+  - name: Create a download directory if it does not exist
+    become: yes
+    ansible.builtin.file:
+      path: /opt/download/
+      state: directory
+      mode: '0755'
+
+  - name: Download sonarqube
+    become: yes
+    get_url:
+      url: https://binaries.sonarsource.com/CommercialDistribution/sonarqube-datacenter/sonarqube-datacenter-8.6.0.39681.zip
+      dest: /opt/download/sonarqube-datacenter-8.6.0.39681.zip
+      tmp_dest: /opt/download/
+
+  - name: Unarchive Sonarqube
+    become: yes
+    ansible.builtin.unarchive:
+      src: /opt/download/sonarqube-datacenter-8.6.0.39681.zip
+      dest: /opt/sonarqube/
+      remote_src: yes
+
+  - name: Recursively change ownership of a directory
+    ansible.builtin.file:
+      path: /opt/
+      state: directory
+      recurse: yes
+      owner: sonar
+      group: sonar

@@ -1,0 +1,116 @@
+# Sample Response Properties for CLM deploy with all apps on one machine
+# These props will use the default db's and data warehouses,
+# use Tomcat User Registry, create a user with id and password a/a,
+# register all the local applications (CCM/QM/RM),
+# and deploy the MTM sample (only if includeLifecycleProjectStep=true is passed as an option)
+# Some settings needs to be changed, such as the public URI, database and data warehouse locations,
+# the user registry settings, and more. Browse through and change as needed.
+#Fri May 11
+
+configure.public.uri.page\:server.webapp.url=https\://localhost\:9443/jts
+configure.public.uri.page\:server.webapp.url.confirm=true
+
+configure.database.page\:db.vendor=DERBY
+configure.database.page\:db.type=JDBC
+configure.database.page\:db.jdbc.location=conf/jts/derby/repositoryDB
+
+configure.email.page\:notification.mail.enabled=false
+#configure.email.page\:notification.mail.smtp.server=
+#configure.email.page\:notification.mail.smtp.user=
+#configure.email.page\:notification.mail.smtp.password=
+#configure.email.page\:notification.mail.from=
+#configure.email.page\:notification.mail.from_name=
+#configure.email.page\:notification.mail.reply=
+#configure.email.page\:notification.mail.smtp.server.port=25
+#configure.email.page\:notification.mail.smtp.starttls=false
+#configure.email.page\:notification.mail.restrict_to_whitelist=false
+#configure.email.page\:notification.mail.whitelist=
+
+data.warehouse.page\:db.net.port=1527
+data.warehouse.page\:db.jdbc.location=conf/jts/derby/warehouseDB
+data.warehouse.page\:db.vendor=DERBY
+data.warehouse.page\:db.type=JDBC
+
+#==BEGIN Tomcat User Registry Props==
+
+#DETECT is the value for Tomcat User Registry. See the LDAP props if you want to use LDAP
+user.registry.page\:user.registry.type=DETECT
+
+#Change these values if you want to create a user with different properties.
+create.user.page\:password=a
+create.user.page\:name=a
+create.user.page\:emailAddress=a@a.a
+create.user.page\:userId=a
+
+#==END Tomcat User Registry Props==
+
+
+# ==BEGIN LDAP Props==
+
+# If you want LDAP instead of Tomcat User Registry, uncomment these LDAP props and
+# comment out the Tomcat User Registry Props. Change the values as needed.
+
+#user.registry.page\:user.registry.type=LDAP
+#user.registry.page\:ldap.registryLocation=ldap\://ldap.rtp.raleigh.ibm.com\:389
+#user.registry.page\:ldap.groupMapping=JazzProjectAdmins\=RQMSVTJazzAdmins,JazzAdmins\=RQMSVTJazzAdmins,JazzUsers\=RQMSVTJazzUsers,JazzDWAdmins\=RQMSVTJazzAdmins,JazzGuests\=RQMSVTJazzUsers
+#user.registry.page\:ldap.registryPassword=
+#user.registry.page\:ldap.registryUserName=
+#user.registry.page\:ldap.membersOfGroup=uniqueMember
+#user.registry.page\:ldap.baseGroupDN=dc\=RPTSVT,dc\=domain
+#user.registry.page\:ldap.userAttributesMapping=userId\=uid,name\=cn,emailAddress\=mail
+#user.registry.page\:ldap.groupNameAttribute=cn
+#user.registry.page\:ldap.baseUserDN=dc\=RPTSVT,dc\=domain
+#compute.LDAP.queries.step\:compute.LDAP.queries=true
+
+# ==END LDAP Props==
+
+admin.access\:ws.allow.admin.access=false
+
+register.applications.page\:jts.register.rm=true
+register.applications.page\:rm.discovery.url=https\://localhost\:9443/rm/scr
+register.applications.page\:rm.application.title=/rm
+
+register.applications.page\:jts.register.qm=true
+register.applications.page\:qm.discovery.url=https\://localhost\:9443/qm/scr
+register.applications.page\:qm.application.title=/qm
+
+register.applications.page\:jts.register.ccm=true
+register.applications.page\:ccm.discovery.url=https\://localhost\:9443/ccm/scr
+register.applications.page\:ccm.application.title=/ccm
+
+register.applications.page\:jts.nonlocal.application.number=0
+
+# activates and assigns the RRC Analyst license
+license.assignment.page\:com.ibm.team.rrc.author.activate.trial=true
+license.assignment.page\:license.RationalRequirementsComposer=com.ibm.team.rrc.author
+license.assignment.page\:com.ibm.team.rrc.author.agreement=true
+
+# activates and assigns the RQM Quality Professional license
+license.assignment.page\:com.ibm.rqm.tester.agreement=true
+license.assignment.page\:com.ibm.rqm.tester.activate.trial=true
+license.assignment.page\:license.RationalQualityManager=com.ibm.rqm.tester
+
+# activates and assigns the RTC Developer license
+license.assignment.page\:license.RationalTeamConcert=com.ibm.team.rtc.developer
+license.assignment.page\:com.ibm.team.rtc.developer.agreement=true
+license.assignment.page\:com.ibm.team.rtc.developer.activate.trial=true
+
+qm\:configure.database.page\:db.jdbc.location=conf/qm/derby/repositoryDB
+qm\:configure.database.page\:db.vendor=DERBY
+qm\:configure.database.page\:db.type=JDBC
+
+qm\:data.warehouse.page\:db.vendor=derby_net
+qm\:data.warehouse.page\:db.type=JDBC
+qm\:data.warehouse.page\:db.jdbc.location=//localhost\:1527/conf/jts/derby/warehouseDB
+qm\:data.warehouse.page\:db.jdbc.password=
+
+ccm\:configure.database.page\:db.type=JDBC
+ccm\:configure.database.page\:db.vendor=DERBY
+ccm\:configure.database.page\:db.jdbc.location=conf/ccm/derby/repositoryDB
+
+ccm\:data.warehouse.page\:db.jdbc.password=
+ccm\:data.warehouse.page\:db.jdbc.location=//localhost\:1527/conf/jts/derby/warehouseDB
+ccm\:data.warehouse.page\:db.type=JDBC
+ccm\:data.warehouse.page\:db.vendor=derby_net
+
+admin\:com.ibm.team.lpa.deploySampleStep\:lpa.deploy.MTM=true

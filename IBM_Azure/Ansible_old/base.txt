@@ -1,0 +1,90 @@
+install Jazz Auth server
+
+Prerequesites
+
+Need :
+
+JazzAuthServer-offering-repo-7.0.1.zip
+ELM-Web-Installer-Linux-7.0.1.zip
+
+copy metadata file
+
+
+sudo vi /etc/security/limits.conf
+
+# input the following
+* hard nofile 65536
+* soft nofile 65536
+* hard nproc 10000
+* soft nproc 10000
+
+sudo vi /etc/security/limits.d/20-nproc.conf
+
+#if you are using REHL7, ensure that the nproc value in /etc/security/limits.d/20-nproc.conf is set to 10000.
+
+sudo yum install java-11-openjdk-devel net-tools nmap unzip wget -y
+sudo unzip ELM-Web-Installer-Linux-7.0.1.zip -d /opt/ELM
+sudo mkdir /opt/ELM/im/repo
+sudo unzip JazzAuthServer-offering-repo-7.0.1 -d /opt/jas
+sudo mv /opt/jas/im/repo/jlip-auth-offering/offering-repo /opt/ELM/im/repo -v
+cd /opt/ELM/im/linux.gtk.x86_64/
+sudo ./installc -showVerboseProgress -input silent-install-jas2.xml --launcher.ini silent-install.ini -acceptLicense
+
+sudo useradd jazz
+sudo chown -R jazz:jazz /opt/IBM
+
+sudo vi /opt/IBM/JazzAuthServer/wlp/usr/servers/jazzop/server.xml
+
+instreuctions 
+
+<--!
+Enable the Jazz Authorization Server to support SAML 2.0.
+Open the JazzAuthServer_install_dir/wlp/usr/servers/jazzop/server.xml file in an editor.
+Locate the SAML xml section and follow the instructions between the <!-- SAML> and <!-- end of SAML> comments to enable the SAML and SSL features.
+Open the JazzAuthServer_install_dir/wlp/usr/servers/jazzop/appConfig.xml file in an editor.
+Locate the SAML xml section between the <!-- SAML> and <!-- end of SAML> comments. Uncomment the <samlWebSso2.0> and <authFilter> elements.
+Note
+The mapTouserRegistry="User" property ensures that users are recognized by the Jazz Authorization Server. You need this property only if your deployment includes ELM clients that are based on Eclipse technology. If you are using ELM web clients only, which retrieve group information directly from SAML, you do not need to use the mapToUserRegistry="User" property.
+Example: The following sample code shows the SAML section of an appConfig.xml file that is edited to support SAML 2.0.
+<samlWebSso20 
+   id="defaultSP" 
+      spCookieName="jazzop_sso_cookie_idp"
+      forceAuthn="true"
+      authFilterRef="samlAuthFilter">
+</samlWebSso20>
+
+<authFilter id="samlAuthFilter">
+   <requestUrl id="samlRequestUrl" urlPattern="/authorize" matchType="contains" />
+   <userAgent id="samlUserAgent" agent="Mozilla|Opera" matchType="contains" />
+</authFilter>
+Copy code
+Save your changes and close the file.
+
+-->
+
+sudo mv EWM2_FederationMetadata.xml /opt/IBM/JazzAuthServer/wlp/usr/servers/jazzop/resources/security/idpMetadata.xml
+
+
+sudo vi /opt/IBM/JazzAuthServer/wlp/usr/servers/jazzop/appConfig.xml 
+
+
+
+
+sudo mv EWM2_FederationMetadata.xml /opt/IBM/JazzAuthServer/wlp/usr/servers/jazzop/resources/security/idpMetadata.xml
+
+mv /opt/IBM/JazzAuthServer/wlp/usr/servers/jazzop/resources/security/idpmetadata.xml /opt/IBM/JazzAuthServer/wlp/usr/servers/jazzop/resources/security/idpMetadata.xml
+
+
+
+
+
+
+
+
+
+
+
+
+/opt/ELM/im/linux.gtk.x86_64
+
+JazzAuthServer-offering-repo-7.0.1.zip 

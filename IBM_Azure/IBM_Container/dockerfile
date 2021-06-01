@@ -1,0 +1,13 @@
+FROM centos:latest
+COPY . /app
+WORKDIR /user/app 
+
+#RUN yum install -y wget ansible
+RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+RUN yum -y upgrade
+RUN yum install -y ansible
+
+ADD playbook.yml /etc/ansible/
+WORKDIR /etc/ansible
+
+RUN ansible-playbook /etc/ansible/playbook.yml -vv

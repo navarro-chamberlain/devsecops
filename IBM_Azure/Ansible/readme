@@ -1,0 +1,96 @@
+SQL tools
+
+sudo curl -o /etc/yum.repos.d/msprod.repo https://packages.microsoft.com/config/rhel/7/prod.repo
+sudo yum remove mssql-tools unixODBC-utf16-devel -y
+sudo yum install mssql-tools unixODBC-devel -y
+
+
+sqlcmd -S ibmdbserver.database.windows.net -U sqladmin -P '$7$&l7q8zu*u1&no' -i /home/azureuser/workspace/Ansible/createEWMDBs.sql
+sqlcmd -S ibmdbserver.database.windows.net -d oath2db -U oauth2dbDBuser -P 'oauth2dbDBpswd' -i /home/azureuser/workspace/Ansible/createOauthMSSQL.sql
+sqlcmd -S ibmdbserver.database.windows.net -U sqladmin -P '$7$&l7q8zu*u1&no' -i 
+
+
+<dataSource id="OAUTH2DBDS" jndiName="jdbc/OAUTH2DB">
+<jdbcDriver libraryRef="MSJDBCLib"/>
+<properties.microsoft.sqlserver user="oauth2dbDBuser" password="oauth2dbDBpswd" databaseName="OAUTH2DB" serverName="ibmdbserver" portNumber="1433"/>
+</dataSource>
+<library id="MSJDBCLib">
+<fileset dir="${shared.config.dir}/lib/global" id="sqljdbc42" includes="sqljdbc42.jar"/>
+</library>
+
+
+You can run the setup command from a command-line to set up databases, configure email settings, configure the user registry, and register any applications you have just installed.
+
+The setup command is a repository tools command that allows you to set up a Jazz Team Server and associated applications without using the setup wizard. The command may be run in interactive mode to help capture the response file needed to drive future automated installations. See Repository tools command to configure the server for the explanation of each parameter that you can use with the command.
+
+Before you begin
+
+Prior to running the setup command, you must have installed the Jazz Team Server and any ELM applications, created your databases, and deployed and started the applications on your application server.
+
+Procedure
+
+Open a command window and enter the following commands:
+cd Jazz_Install_Dir/server
+./repotools-jts.sh -setup repositoryURL=https://qualified.hostname.com:9443/jts adminUserID=ADMIN adminPassword=ADMIN
+
+Configure a public URI and then hit Enter.
+Read the warning and confirm your public URI:
+I understand that once the Public URI is set, it cannot be modified except with additional administrative commands, which can result in broken links from other applications that do not support changing URLs.
+
+Choose Confirm Public URI:
+
+[1] I understand
+[2] Cancel and exit setup - default
+
+At the Configure Database step, enter a number to choose a DB connection type:
+[1] JDBC - Default
+[2] J2EE
+
+Enter a number to choose a database vendor:
+[1] Derby - default
+[2] Db2
+[3] SQL Server
+[4] Db2 for z/OS
+[5] Db2i
+[6] Derby Net
+[7] Oracle
+
+Enter a location for the JDBC database. If the location contains password, use the value {password} instead of the actual password.
+For example:
+
+//localhost:1433;databaseName=jts;user=jtsDBuser;password={password};
+
+Enter Y to enable the email notification. Enter N to skip.
+At the Configure User Registry step, enter a number corresponding to one of the following entries:
+[1] LIBERTY
+[2] LDAP
+[3] Non-LDAP External Registry
+
+Enter the following information to create an administrative user.
+User ID
+Password (The password is not displayed on the screen.)
+Re-Type Password
+Your full name
+Email address
+If you selected LDAP, the logged in user information is imported. If you selected Non-LDAP, the password is not required.
+
+After you created the administrative user, you can disable the default ADMIN user. Choose one these options:
+[1] Disable - default
+[2] Do Not Disable
+
+Next, depending on installed applications, you will be asked to register local applications. Enter Y to confirm and enter the instance name (context root) and discovery URL for each application.
+ Note: A local application is an application that is installed under the same application server as Jazz Team Server and its details can be discovered. A non-local application is either installed in a distributed environment or not installed in the same application server as Jazz Team Server and its details must be provided by the user.
+
+The following table displays the applications that can be registered with Jazz Team Server with their context root and discovery URL:
+
+ELM applications with their default context root and discovery URL
+Application Name	Context root	Discovery URL
+Change and Configuration Management
+
+/ccm
+
+https://server.example.org:9443/ccm/scr
+
+At the Assign Licenses step, for each installed application select the appropriate Client Access License(s) to be assigned to your user. You can assign additional license keys in the Admin UI as needed.
+At the Configure Data Warehouse data base step, choose a DB connection type and database vendor. For the database network server port, assign a unique port number within the hosting server. The default port number is 1527.
+At the end of the setup, you should see message on the screen that the setup completed successfully.

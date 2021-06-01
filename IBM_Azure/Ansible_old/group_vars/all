@@ -1,0 +1,7 @@
+---
+
+jas_binary: https://diagc8909e4e6fca01a1.blob.core.windows.net/binaries/JazzAuthServer-offering-repo-7.0.2.zip
+elm_binary: https://diagc8909e4e6fca01a1.blob.core.windows.net/binaries/ELM-Web-Installer-Linux-7.0.2.zip
+jts_binary: 
+ewm_port: 9443
+jas_port: 9643
